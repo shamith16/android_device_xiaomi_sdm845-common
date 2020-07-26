@@ -4,6 +4,8 @@ import 'package:flutter_icons/flutter_icons.dart';
 import 'package:get/get.dart';
 import 'package:secur/src/controllers/totp_controller.dart';
 import 'package:secur/src/services/barcode_scan.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:secur/src/themes/theme.dart';
 
 class Home extends StatelessWidget {
   @override
@@ -34,20 +36,18 @@ Widget appBar(context) => AppBar(
       centerTitle: true,
     );
 
-Widget homeBody(context) => SafeArea(
+Widget homeBody(BuildContext context) => SafeArea(
       child: Container(
           child: GetBuilder<TOTPController>(
         init: TOTPController(),
         builder: (controller) {
           var values = controller.db.values.toList();
           if (values.isEmpty) {
-            return Center(child: Text('Nothing to see here'));
+            return Center(
+              child: Text('Nothing to see here'),
+            );
           } else {
-            return ListView.builder(
-                itemCount: values.length,
-                itemBuilder: (ctx, index) {
-                  return Text(values[index].toString());
-                });
+            return _buildBody(context, values);
           }
         },
       )),
@@ -107,4 +107,67 @@ void _bottomSheet(context) {
       );
     },
   );
+}
+
+Widget _buildBody(BuildContext context, List values) {
+  return ListView.builder(
+      itemCount: values.length,
+      itemBuilder: (ctx, index) {
+        return Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Dismissible(
+              onDismissed: (direction) {
+                values.removeAt(index);
+              },
+              direction: DismissDirection.endToStart,
+              background: Container(
+                padding: EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: CupertinoColors.destructiveRed,
+                ),
+                height: 130,
+                alignment: Alignment.centerRight,
+                width: MediaQuery.of(context).size.width,
+                margin: EdgeInsets.all(10),
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Icon(Icons.delete_outline),
+                ),
+              ),
+              key: ValueKey(index),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: deepBlueSecondary,
+                ),
+                alignment: Alignment.center,
+                padding: EdgeInsets.all(10),
+                height: 130,
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          margin: EdgeInsets.only(left: 10, top: 2),
+                          height: MediaQuery.of(context).size.height /14.5 ,
+                          width: MediaQuery.of(context).size.width /8,
+                          alignment: Alignment.center,
+                          child: Icon(FontAwesome.google,color: neonGreen,size: 35,),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).primaryColor,
+                              borderRadius: BorderRadius.circular(12)),
+                        ),
+                        Container(
+                          child: Column(),
+                        ),
+                        Container(),
+                      ],
+                    ),
+                    Row(),
+                  ],
+                ),
+              )),
+        );
+      });
 }
